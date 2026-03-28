@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chromatic Scale Player</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 30px;
+    }
+    button {
+      margin: 5px;
+      padding: 15px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Chromatic Scale (C4 → C5)</h1>
+
+<div id="buttons"></div>
+
+<script>
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  // Frequencies for chromatic scale from C4 to C5
+  const notes = [
+    { name: "C4", freq: 261.63 },
+    { name: "C#4", freq: 277.18 },
+    { name: "D4", freq: 293.66 },
+    { name: "D#4", freq: 311.13 },
+    { name: "E4", freq: 329.63 },
+    { name: "F4", freq: 349.23 },
+    { name: "F#4", freq: 369.99 },
+    { name: "G4", freq: 392.00 },
+    { name: "G#4", freq: 415.30 },
+    { name: "A4", freq: 440.00 },
+    { name: "A#4", freq: 466.16 },
+    { name: "B4", freq: 493.88 },
+    { name: "C5", freq: 523.25 }
+  ];
+
+  function playNote(frequency) {
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.type = "sine";
+    oscillator.frequency.value = frequency;
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    oscillator.start();
+
+    // Fade out to avoid clicks
+    gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+
+    oscillator.stop(audioCtx.currentTime + 1);
+  }
+
+  const container = document.getElementById("buttons");
+
+  notes.forEach(note => {
+    const btn = document.createElement("button");
+    btn.textContent = note.name;
+    btn.onclick = () => playNote(note.freq);
+    container.appendChild(btn);
+  });
+</script>
+
+</body>
+</html>
